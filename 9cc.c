@@ -25,7 +25,15 @@ struct Token{
 char *user_input; //input program
 Token *token; //current token
 
-//Report error place
+void error(char *fmt, ...){
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    exit(1);
+}
+
+//Report error and error place
 void error_at(char *loc, char *fmt, ...){
     va_list ap;
     va_start(ap, fmt);
@@ -238,10 +246,8 @@ void gen(Node *node){
 }
 
 int main(int argc, char **argv){
-    if (argc != 2){
-        fprintf(stderr, "Wrong number of arguments\n");
-        return 1;
-    }
+    if (argc != 2)
+        error("%s: invalid number of arguments", argv[0]);
 
     user_input = argv[1];
     token = tokenize();
