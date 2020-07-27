@@ -6,3 +6,5 @@ tmp*
 a.out
 9cc
 memo.md
+compile_commands.json
+.clangd/
