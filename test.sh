@@ -49,5 +49,7 @@ assert 1 '1 >= 0 ;'
 assert 1 '1 >= 1 ;'
 
 assert 13 'a = 2; b = 1; c = a + b; d = c + 10 ;'
+assert 3 'foo = 2; bar = 1; hoge = foo + bar;'
+assert 15 'opuy0sh1 = 10; c0mpiler = 5; sum_resu1t = opuy0sh1 + c0mpiler;'
 
 echo OK

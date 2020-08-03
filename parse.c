@@ -1,5 +1,16 @@
 #include "9cc.h"
 
+// local variables type
+typedef struct LVar LVar;
+struct LVar{
+    LVar *next;  // next variable or NULL
+    char *name;  // variable name
+    int len;  // number of character
+    int offset;  // offset from RBP
+};
+
+LVar *locals;
+
 //Allocate Node memory and input Node type
 static Node *new_node(NodeKind kind){
     Node *node = calloc(1, sizeof(Node));
@@ -28,6 +39,13 @@ static Token *consume_ident(){
     Token *t = token;
     token = token->next;
     return t;
+}
+
+static LVar *find_lvar(Token *tok){
+    for(LVar *var = locals; var; var = var->next)
+        if(var->len == tok->len && !memcmp(tok->str, var->name, var->len))
+            return var;
+    return NULL;
 }
 
 Node *code[100];  //store lines
@@ -151,7 +169,22 @@ static Node *primary(void){
     if(tok){
         Node *node = calloc(1, sizeof(Node));
         node->kind = ND_LVAR;
-        node->offset = (tok->str[0] - 'a' + 1) * 8;
+        LVar *lvar = find_lvar(tok);  // check variable name
+        if(lvar)
+            node->offset = lvar->offset;
+        // resister new variable
+        else{
+            lvar = calloc(1, sizeof(LVar));
+            lvar->next = locals;
+            lvar->name = tok->str;
+            lvar->len = tok->len;
+            if(!locals)
+                lvar->offset = 8;
+            else
+                lvar->offset = locals->offset + 8;
+            node->offset = lvar->offset;
+            locals = lvar;
+        }
         return node;
     }
 
