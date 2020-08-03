@@ -11,6 +11,7 @@
 //Token type
 typedef enum{
     TK_RESERVED, //symbol
+    TK_IDENT,  //identifier
     TK_NUM,  //integer
     TK_EOF,  // End Of File
 }TokenKind;
@@ -41,6 +42,8 @@ typedef enum{
     ND_SUB,  // -
     ND_MUL,  // *
     ND_DIV,  // -
+    ND_ASSIGN,  // =
+    ND_LVAR, // local valiable
     ND_EQ, // ==
     ND_NE, // !=
     ND_LT, // <
@@ -55,10 +58,12 @@ struct Node{
     Node *lhs;  //left-hand side
     Node *rhs;  //right-hand side
     int val;  //used if kind == ND_NUM
+    int offset;  //used if kind == ND_LVAR
 };
 
-Node *expr(void);
+void program(void);
+extern Node *code[];  //save parsed sentences
 
-void codegen(Node *node);
+void codegen();
 
 #endif

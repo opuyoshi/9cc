@@ -22,6 +22,19 @@ static Node *new_num(int val){
     return node;
 }
 
+static Token *consume_ident(){
+    if(token->kind != TK_IDENT)
+        return NULL;
+    Token *t = token;
+    token = token->next;
+    return t;
+}
+
+Node *code[100];  //store lines
+
+static Node *stmt(void);
+static Node *expr(void);
+static Node *assign(void);
 static Node *equality(void);
 static Node *relational(void);
 static Node *add(void);
@@ -29,9 +42,31 @@ static Node *mul(void);
 static Node *unary(void);
 static Node *primary(void);
 
-// expr = equality
-Node *expr(void){
-    return equality();
+void program(){
+    int i = 0;
+    while(!at_eof())
+        code[i++] = stmt();
+    code[i] = NULL;
+}
+
+// stmt = expr ";"
+static Node *stmt(){
+    Node *node = expr();
+    expect(";");
+    return node;
+}
+
+// expr = assign
+static Node *expr(){
+    return assign();
+}
+
+// assign = equality ("=" assign)?
+Node *assign(){
+    Node *node = equality();
+    if(consume("="))
+        node = new_binary(ND_ASSIGN, node, assign());
+    return node;
 }
 
 // equality = relational ("==" relational | "!=" relational)*
@@ -104,11 +139,19 @@ static Node *unary(void){
     return primary();
 }
 
-// primary = "(" expr ")" | num
+// primary = num | ident | "(" expr ")"
 static Node *primary(void){
     if(consume("(")){
         Node *node = expr();
         expect(")");
+        return node;
+    }
+
+    Token *tok = consume_ident();
+    if(tok){
+        Node *node = calloc(1, sizeof(Node));
+        node->kind = ND_LVAR;
+        node->offset = (tok->str[0] - 'a' + 1) * 8;
         return node;
     }
 
