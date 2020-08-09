@@ -52,4 +52,8 @@ assert 13 'a = 2; b = 1; c = a + b; d = c + 10 ;'
 assert 3 'foo = 2; bar = 1; hoge = foo + bar;'
 assert 15 'opuy0sh1 = 10; c0mpiler = 5; sum_resu1t = opuy0sh1 + c0mpiler;'
 
+assert 5 'return 5;'
+assert 10 'return 10; return 5;'
+assert 14 'a = 5; b = 9; return c = a + b ; return d = c + 5;'
+
 echo OK

@@ -13,6 +13,7 @@ typedef enum{
     TK_RESERVED, //symbol
     TK_IDENT,  //identifier
     TK_NUM,  //integer
+    TK_RETURN,  // return
     TK_EOF,  // End Of File
 }TokenKind;
 
@@ -49,6 +50,7 @@ typedef enum{
     ND_LT, // <
     ND_LE, // <=
     ND_NUM,  // Integer
+    ND_RETURN,  // return
 } NodeKind;
 
 //Define Node

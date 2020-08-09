@@ -9,7 +9,7 @@ struct LVar{
     int offset;  // offset from RBP
 };
 
-LVar *locals;
+LVar *locals;  // save local variables
 
 //Allocate Node memory and input Node type
 static Node *new_node(NodeKind kind){
@@ -41,6 +41,13 @@ static Token *consume_ident(){
     return t;
 }
 
+static bool consume_return(){
+    if(token->kind != TK_RETURN)
+        return false;
+    token = token->next;
+    return true;
+}
+
 static LVar *find_lvar(Token *tok){
     for(LVar *var = locals; var; var = var->next)
         if(var->len == tok->len && !memcmp(tok->str, var->name, var->len))
@@ -50,16 +57,17 @@ static LVar *find_lvar(Token *tok){
 
 Node *code[100];  //store lines
 
-static Node *stmt(void);
-static Node *expr(void);
-static Node *assign(void);
-static Node *equality(void);
-static Node *relational(void);
-static Node *add(void);
-static Node *mul(void);
-static Node *unary(void);
-static Node *primary(void);
+static Node *stmt(void);  // stmt = expr ";" | "return" ";"
+static Node *expr(void);  // expr = assign
+static Node *assign(void);  // assign = equality ("=" assign)?
+static Node *equality(void);  // equality = relational ("==" relational | "!=" relational)*
+static Node *relational(void);  // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+static Node *add(void);  // add = mul ("+" mul | "-" mul)*
+static Node *mul(void);  // mul = unary ("*" unary | "/" unary)*
+static Node *unary(void);  // unary = ("+" | "-")? primary
+static Node *primary(void);  // primary = num | ident | "(" expr ")"
 
+// program = stmt*
 void program(){
     int i = 0;
     while(!at_eof())
@@ -67,9 +75,17 @@ void program(){
     code[i] = NULL;
 }
 
-// stmt = expr ";"
+// stmt = expr ";" | "return" ";"
 static Node *stmt(){
-    Node *node = expr();
+    Node *node;
+    if(consume_return()){
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_RETURN;
+        node->lhs = expr();
+    }
+    else
+        node = expr();
+
     expect(";");
     return node;
 }

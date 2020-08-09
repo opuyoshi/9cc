@@ -53,6 +53,10 @@ int expect_number(){
     return val;
 }
 
+int is_alnum(char c){
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') ||
+           ('0' <= c && c <= '9') || (c == '_');
+}
 
 bool at_eof(){
     return token->kind == TK_EOF;
@@ -107,6 +111,14 @@ Token *tokenize(){
             char *q = p;
             cur->val = strtol(p, &p, 10);
             cur->len = p - q;
+            continue;
+        }
+
+        // return statement
+        // note: this case must process ahead of identifier case
+        if(strncmp(p, "return", 6) == 0 && !is_alnum(p[6])){
+            cur = new_token(TK_RETURN, cur, p, 6);
+            p += 6;
             continue;
         }
 
