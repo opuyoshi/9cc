@@ -56,4 +56,8 @@ assert 5 'return 5;'
 assert 10 'return 10; return 5;'
 assert 14 'a = 5; b = 9; return c = a + b ; return d = c + 5;'
 
+assert 3 'if(0) return 2; return 3;'
+assert 2 'if(3) return 2; return 3;'
+assert 10 'a = 4; if(a == 3) return 3; return a + 6;'
+
 echo OK

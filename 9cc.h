@@ -10,20 +10,19 @@
 
 //Token type
 typedef enum{
-    TK_RESERVED, //symbol
-    TK_IDENT,  //identifier
-    TK_NUM,  //integer
-    TK_RETURN,  // return
+    TK_RESERVED, // symbol
+    TK_IDENT,  // identifier
+    TK_NUM,  // integer
     TK_EOF,  // End Of File
 }TokenKind;
 
 typedef struct Token Token;
 struct Token{
-    TokenKind kind; //Token type
-    Token *next;  //Next token
-    int val;  //If token type is TK_NUM, input integer
-    char *str;  //Token character
-    int len;  //Token length
+    TokenKind kind; // Token type
+    Token *next;  // Next token
+    int val;  // If token type is TK_NUM, input integer
+    char *str;  // Token character
+    int len;  // Token length
 };
 
 
@@ -51,16 +50,19 @@ typedef enum{
     ND_LE, // <=
     ND_NUM,  // Integer
     ND_RETURN,  // return
+    ND_IF,  // if
 } NodeKind;
 
 //Define Node
 typedef struct Node Node;
 struct Node{
     NodeKind kind;  // Node kind
-    Node *lhs;  //left-hand side
-    Node *rhs;  //right-hand side
-    int val;  //used if kind == ND_NUM
-    int offset;  //used if kind == ND_LVAR
+    Node *lhs;  // left-hand side
+    Node *rhs;  // right-hand side
+    Node *cond;  // conditional expression
+    Node *then;  // process after if == true
+    int val;  // used if kind == ND_NUM
+    int offset;  // used if kind == ND_LVAR
 };
 
 void program(void);

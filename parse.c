@@ -1,4 +1,5 @@
 #include "9cc.h"
+#include <stdlib.h>
 
 // local variables type
 typedef struct LVar LVar;
@@ -41,13 +42,6 @@ static Token *consume_ident(){
     return t;
 }
 
-static bool consume_return(){
-    if(token->kind != TK_RETURN)
-        return false;
-    token = token->next;
-    return true;
-}
-
 static LVar *find_lvar(Token *tok){
     for(LVar *var = locals; var; var = var->next)
         if(var->len == tok->len && !memcmp(tok->str, var->name, var->len))
@@ -57,15 +51,26 @@ static LVar *find_lvar(Token *tok){
 
 Node *code[100];  //store lines
 
-static Node *stmt(void);  // stmt = expr ";" | "return" ";"
-static Node *expr(void);  // expr = assign
-static Node *assign(void);  // assign = equality ("=" assign)?
-static Node *equality(void);  // equality = relational ("==" relational | "!=" relational)*
-static Node *relational(void);  // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
-static Node *add(void);  // add = mul ("+" mul | "-" mul)*
-static Node *mul(void);  // mul = unary ("*" unary | "/" unary)*
-static Node *unary(void);  // unary = ("+" | "-")? primary
-static Node *primary(void);  // primary = num | ident | "(" expr ")"
+/*
+program = stmt*
+stmt = expr ";" | "return" expr ";" | "if" "(" expr ")" stmt ("else" stmt)?
+expr = assign
+assign = equality ("=" assign)?
+equality = relational ("==" relational | "!=" relational)*
+relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+add = mul ("+" mul | "-" mul)*
+mul = unary ("*" unary | "/" unary)*
+unary = ("+" | "-")? primary
+primary = num | ident | "(" expr ")"
+*/
+static Node *stmt(void);static Node *expr(void);
+static Node *assign(void);
+static Node *equality(void);
+static Node *relational(void);
+static Node *add(void);
+static Node *mul(void);
+static Node *unary(void);
+static Node *primary(void);
 
 // program = stmt*
 void program(){
@@ -75,13 +80,20 @@ void program(){
     code[i] = NULL;
 }
 
-// stmt = expr ";" | "return" ";"
+// stmt = expr ";" | "return" expr ";" | "if" "(" expr ")" stmt ("else" stmt)?
 static Node *stmt(){
     Node *node;
-    if(consume_return()){
-        node = calloc(1, sizeof(Node));
-        node->kind = ND_RETURN;
+    if(consume("return")){
+        node = new_node(ND_RETURN);
         node->lhs = expr();
+    }
+    else if(consume("if")){
+        node = new_node(ND_IF);
+        expect("(");
+        node->cond = expr();
+        expect(")");
+        node->then = stmt();
+        return node;
     }
     else
         node = expr();
@@ -183,8 +195,7 @@ static Node *primary(void){
 
     Token *tok = consume_ident();
     if(tok){
-        Node *node = calloc(1, sizeof(Node));
-        node->kind = ND_LVAR;
+        Node *node = new_node(ND_LVAR);
         LVar *lvar = find_lvar(tok);  // check variable name
         if(lvar)
             node->offset = lvar->offset;

@@ -1,4 +1,5 @@
 #include "9cc.h"
+#include <string.h>
 
 char *user_input;
 Token *token;
@@ -53,19 +54,33 @@ int expect_number(){
     return val;
 }
 
-int is_alnum(char c){
+// Compare character to operator
+static bool startswith(char *p, char *q){
+    return memcmp(p, q, strlen(q)) == 0;
+}
+
+// judge alphabet, number and under score
+static int is_alnum(char c){
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') ||
            ('0' <= c && c <= '9') || (c == '_');
 }
+
+// judge reserved words
+static char *is_reserved(char *p){
+    char *kw[] = {"return", "if"};
+    for(int i = 0; i < sizeof(kw) / sizeof(*kw); i++){
+        int len = strlen(kw[i]);
+        if(startswith(p, kw[i]) && !is_alnum(p[len]))
+            return kw[i];
+    }
+    return NULL;
+}
+
 
 bool at_eof(){
     return token->kind == TK_EOF;
 }
 
-// Compare character to operator
-static bool startswith(char *p, char *q){
-    return memcmp(p, q, strlen(q)) == 0;
-}
 
 //Make new token and link to current(cur) token
 static Token *new_token(TokenKind kind, Token *cur, char *str, int len){
@@ -114,11 +129,11 @@ Token *tokenize(){
             continue;
         }
 
-        // return statement
-        // note: this case must process ahead of identifier case
-        if(strncmp(p, "return", 6) == 0 && !is_alnum(p[6])){
-            cur = new_token(TK_RETURN, cur, p, 6);
-            p += 6;
+        char *kw = is_reserved(p);
+        if(kw){
+            int len = strlen(kw);
+            cur = new_token(TK_RESERVED, cur, p, len);
+            p += len;
             continue;
         }
 
