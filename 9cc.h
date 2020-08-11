@@ -61,6 +61,7 @@ struct Node{
     Node *rhs;  // right-hand side
     Node *cond;  // conditional expression
     Node *then;  // process after if == true
+    Node *els;  // else
     int val;  // used if kind == ND_NUM
     int offset;  // used if kind == ND_LVAR
 };

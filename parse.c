@@ -1,5 +1,4 @@
 #include "9cc.h"
-#include <stdlib.h>
 
 // local variables type
 typedef struct LVar LVar;
@@ -93,6 +92,8 @@ static Node *stmt(){
         node->cond = expr();
         expect(")");
         node->then = stmt();
+        if(consume("else"))
+            node->els = stmt();
         return node;
     }
     else

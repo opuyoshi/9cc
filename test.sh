@@ -59,5 +59,6 @@ assert 14 'a = 5; b = 9; return c = a + b ; return d = c + 5;'
 assert 3 'if(0) return 2; return 3;'
 assert 2 'if(3) return 2; return 3;'
 assert 10 'a = 4; if(a == 3) return 3; return a + 6;'
-
+assert 10 'a = 4; if(a == 3) return 3; else return a + 6;'
+assert 15 'a = 4; if (a == 3) return 3; else  b = a + 1 ; if (b == 4) return 14; else return b *3;'
 echo OK

@@ -1,7 +1,6 @@
 #include "9cc.h"
-#include <stdio.h>
 
-static int counter = 1;  // make unique label
+static int counter = 0;  // make unique label
 
 static void gen_lval(Node *node){
     if(node->kind != ND_LVAR)
@@ -39,12 +38,23 @@ static void gen(Node *node){
             printf("    push rdi\n");
             return;
         case ND_IF:
+            counter += 1;
             gen(node->cond);
             printf("    pop rax\n");
             printf("    cmp rax, 0\n");
-            printf("    je .Lend%d\n", counter);
-            gen(node->then);
-            printf("    .Lend%d:\n", counter);
+            if(node->els){  // else
+                printf("    je .Lelse%d\n", counter);
+                gen(node->then);
+                printf("    jmp .Lend%d\n", counter);
+                printf("    .Lelse%d:\n", counter);
+                gen(node->els);
+                printf("    .Lend%d:\n", counter);
+            }
+            else{  // only if statement
+                printf("    je .Lend%d\n", counter);
+                gen(node->then);
+                printf("    .Lend%d:\n", counter);
+            }
             return;
     }
 
