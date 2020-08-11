@@ -37,7 +37,7 @@ static void gen(Node *node){
             printf("    mov [rax], rdi\n");
             printf("    push rdi\n");
             return;
-        case ND_IF:
+        case ND_IF:  // if
             counter += 1;
             gen(node->cond);
             printf("    pop rax\n");
@@ -55,6 +55,17 @@ static void gen(Node *node){
                 gen(node->then);
                 printf("    .Lend%d:\n", counter);
             }
+            return;
+        case ND_WHILE:  // while
+            counter += 1;
+            printf("    .Lbegin%d:\n", counter);
+            gen(node->cond);
+            printf("    pop rax\n");
+            printf("    cmp rax, 0\n");
+            printf("    je .Lend%d\n", counter);
+            gen(node->then);
+            printf("    jmp .Lbegin%d\n", counter);
+            printf("    .Lend%d:", counter);
             return;
     }
 

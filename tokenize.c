@@ -66,7 +66,7 @@ static int is_alnum(char c){
 
 // judge reserved words
 static char *is_reserved(char *p){
-    char *kw[] = {"return", "if", "else"};
+    char *kw[] = {"return", "if", "else", "while"};
     for(int i = 0; i < sizeof(kw) / sizeof(*kw); i++){
         int len = strlen(kw[i]);
         if(startswith(p, kw[i]) && !is_alnum(p[len]))
