@@ -56,6 +56,7 @@ stmt = expr ";"
      | "return" expr ";"
      | "if" "(" expr ")" stmt ("else" stmt)?
      | "while" "(" expr ")" stmt
+     | "for" "(" expr?  ";" expr? ";" expr? ")" stmt
 expr = assign
 assign = equality ("=" assign)?
 equality = relational ("==" relational | "!=" relational)*
@@ -82,7 +83,7 @@ void program(){
     code[i] = NULL;
 }
 
-// stmt = expr ";" | "return" expr ";" | "if" "(" expr ")" stmt ("else" stmt)?
+// stmt = expr ";" | "return" expr ";" | "if" "(" expr ")" stmt ("else" stmt)? | ...
 static Node *stmt(){
     Node *node;
     if(consume("return")){
@@ -104,6 +105,24 @@ static Node *stmt(){
         expect("(");
         node->cond = expr();
         expect(")");
+        node->then = stmt();
+        return node;
+    }
+    else if(consume("for")){
+        node = new_node(ND_FOR);
+        expect("(");
+        if(!consume(";")){
+            node->init = expr();
+            expect(";");
+        }
+        if(!consume(";")){
+            node->cond = expr();
+            expect(";");
+        }
+        if(!consume(")")){
+            node->inc = expr();
+            expect(")");
+        }
         node->then = stmt();
         return node;
     }

@@ -65,4 +65,8 @@ assert 15 'a = 4; if (a == 3) return 3; else  b = a + 1 ; if (b == 4) return 14;
 assert 10 'a = 1; while(a < 10) a = a + 1; return a;'
 assert 10 'a = 10; while (a > 15) a = a + 1; return a;'
 assert 20 'a = 1; while (a <10) a = a + 1; while(a > 20) a = a - 1; return a * 2;'
+
+assert 14 'a = 0; for(b = 0; b < 14; b = b + 1) a = a + 1; return a;'
+assert 5 'for (;;) return 5; return 10;'
+
 echo OK

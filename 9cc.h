@@ -52,6 +52,7 @@ typedef enum{
     ND_RETURN,  // return
     ND_IF,  // if
     ND_WHILE,  // while
+    ND_FOR,  // for
 } NodeKind;
 
 //Define Node
@@ -61,8 +62,10 @@ struct Node{
     Node *lhs;  // left-hand side
     Node *rhs;  // right-hand side
     Node *cond;  // conditional expression
-    Node *then;  // process after if == true
-    Node *els;  // else
+    Node *then;  // process after conditional expression is true
+    Node *els;  // "else"
+    Node *init;  // init
+    Node *inc;  // inclease or declease "for" counter
     int val;  // used if kind == ND_NUM
     int offset;  // used if kind == ND_LVAR
 };
