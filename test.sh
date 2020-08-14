@@ -69,4 +69,7 @@ assert 20 'a = 1; while (a <10) a = a + 1; while(a > 20) a = a - 1; return a * 2
 assert 14 'a = 0; for(b = 0; b < 14; b = b + 1) a = a + 1; return a;'
 assert 5 'for (;;) return 5; return 10;'
 
+assert 3 '{1; {2;} return 3;}'
+assert 10 'a = 1; if(a < 50){ b = a + 3; c = b + 6;} return c;'
+
 echo OK

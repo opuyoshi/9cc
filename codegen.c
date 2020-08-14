@@ -84,6 +84,10 @@ static void gen(Node *node){
             printf("    jmp .Lbegin%d\n", counter);
             printf("    .Lend%d:\n", counter);
             return;
+        case ND_BLOCK:  // {...}
+            for(Node *n = node->block; n; n = n->next)
+                gen(n);
+            return;
     }
 
     gen(node->lhs);

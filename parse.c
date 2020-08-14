@@ -54,6 +54,7 @@ Node *code[100];  //store lines
 program = stmt*
 stmt = expr ";"
      | "return" expr ";"
+     | "{" stmt* "}"
      | "if" "(" expr ")" stmt ("else" stmt)?
      | "while" "(" expr ")" stmt
      | "for" "(" expr?  ";" expr? ";" expr? ")" stmt
@@ -124,6 +125,17 @@ static Node *stmt(){
             expect(")");
         }
         node->then = stmt();
+        return node;
+    }
+    else if(consume("{")){
+        Node head = {};
+        Node *cur = &head;
+        while(!consume("}")){
+            cur->next = stmt();
+            cur = cur->next;
+        }
+        node = new_node(ND_BLOCK);
+        node->block = head.next;
         return node;
     }
     else
